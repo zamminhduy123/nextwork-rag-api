@@ -18,22 +18,27 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.13'
 
       - name: Install dependencies
         run: |
-          pip install fastapi uvicorn chromadb requests
+          python -m pip install -U pip
+          pip install fastapi uvicorn chromadb requests ollama
 
       - name: Rebuild embeddings
         run: python scripts/embed_docs.py  # Changed from embed.py
 
-      - name: Start API in mock mode
+      - name: Start API in mock mode (capture logs)
         run: |
-          USE_MOCK_LLM=1 uvicorn app:app --host 0.0.0.0 --port 8000 &
-          sleep 5
+          USE_MOCK_LLM=1 uvicorn app:app --host 127.0.0.1 --port 8000 --log-level debug > uvicorn.log 2>&1 &
+          echo $! > uvicorn.pid
 
       - name: Run semantic tests
         run: python semantic_test.py
+
+      - name: Dump uvicorn logs on failure
+        if: failure()
+        run: cat uvicorn.log
 
       - name: Success
         run: echo "✅ All tests passed! RAG quality maintained."
