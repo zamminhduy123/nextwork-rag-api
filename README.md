@@ -139,3 +139,11 @@ NodePort is a way to make your Service accessible from outside your Kubernetes c
 - LoadBalancer - Requires cloud infrastructure (AWS, GCP, etc.). Not available in local Minikube.
 
 NodePort is the simplest way to access your API from your laptop when using Minikube!
+
+# Github 
+
+💡 What are semantic tests?
+Semantic tests check that your RAG system returns answers with the right meaning, not just the right format. We're testing data quality, not just code correctness!
+
+💡 Why .github/workflows?
+GitHub looks for automation workflows in .github/workflows/ by convention.
