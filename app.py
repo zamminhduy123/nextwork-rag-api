@@ -30,8 +30,9 @@ def health_check():
 
 @app.post("/query")
 def query(q: str):
-    results = collection.app
-    query(query_texts=[q], n_results=1)
+    # Correct Chroma query call
+    results = collection.query(query_texts=[q], n_results=1)
+    # query(query_texts=[q], n_results=1)
     context = results["documents"][0][0] if results["documents"] else ""
 
     # Check if mock mode is enabled
