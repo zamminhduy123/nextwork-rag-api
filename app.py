@@ -4,6 +4,7 @@ import ollama
 
 import os
 import logging
+from pathlib import Path
 
 logging.basicConfig(
     level=logging.INFO,
@@ -13,8 +14,13 @@ logging.basicConfig(
 MODEL_NAME = os.getenv("MODEL_NAME", "tinyllama")
 logging.info(f"Using model: {MODEL_NAME}")
 
+# Make Chroma path configurable (helps CI/K8s)
+CHROMA_PATH = os.getenv("CHROMA_PATH", "./db")
+Path(CHROMA_PATH).mkdir(parents=True, exist_ok=True)
+logging.info(f"Using Chroma path: {CHROMA_PATH}")
+
 app = FastAPI()
-chroma = chromadb.PersistentClient(path="./db")
+chroma = chromadb.PersistentClient(path=CHROMA_PATH)
 collection = chroma.get_or_create_collection("docs")
 
 @app.get('/health')
@@ -24,7 +30,8 @@ def health_check():
 
 @app.post("/query")
 def query(q: str):
-    results = collection.query(query_texts=[q], n_results=1)
+    results = collection.app
+    query(query_texts=[q], n_results=1)
     context = results["documents"][0][0] if results["documents"] else ""
 
     # Check if mock mode is enabled

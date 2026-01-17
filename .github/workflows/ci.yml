@@ -33,6 +33,18 @@ jobs:
           USE_MOCK_LLM=1 uvicorn app:app --host 127.0.0.1 --port 8000 --log-level debug > uvicorn.log 2>&1 &
           echo $! > uvicorn.pid
 
+      - name: Wait for API to be ready
+        run: |
+          for i in {1..40}; do
+            if curl -sf "http://127.0.0.1:8000/health" >/dev/null; then
+              exit 0
+            fi
+            sleep 0.5
+          done
+          echo "API did not become ready. Logs:"
+          cat uvicorn.log
+          exit 1
+
       - name: Run semantic tests
         run: python semantic_test.py
 
